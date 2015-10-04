@@ -26,9 +26,15 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".GeofenceTransitionsIntentService"
-            android:exported="false" />
+
+        <activity
+            android:name=".TestPage"
+            android:label="@string/title_activity_test_page"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity android:name=".Test" >
+        </activity>
+>>>>>>> welcome_screen
     </application>
 
 </manifest>

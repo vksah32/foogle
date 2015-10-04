@@ -11,6 +11,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.renderscript.RenderScript;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -34,6 +36,9 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
+
+
+
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    private NotificationCompat.Builder mBuilder;
+
+
     LocationRequest mLocationRequest;
     private ArrayList<ParseObject> mListOfRestaurants = new ArrayList<ParseObject>();
     @Override
@@ -60,8 +68,18 @@ public class MainActivity extends AppCompatActivity implements
 //                mGoogleApiClient.connect();
 //            }
         //start service
-        createNotification(this, "Lous");
+
+        mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("Foogle")
+                        .setContentText("New Menu received!")
+                        .setAutoCancel(true)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setCategory(Notification.CATEGORY_RECOMMENDATION);
+
         // minimize window
+        createNotification(this, "Lous");
 
     }
 
@@ -98,25 +116,45 @@ public class MainActivity extends AppCompatActivity implements
         mGoogleApiClient.disconnect();
     }
     public void createNotification(Context context, String restaurant) {
-        NotificationManager notificationManager = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification(R.mipmap.ic_launcher,
-                "Message received", System.currentTimeMillis());
-        // Hide the notification after its selected
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+//        NotificationManager notificationManager = (NotificationManager) context
+//                .getSystemService(Context.NOTIFICATION_SERVICE);
+//        Notification notification = new Notification(R.mipmap.ic_launcher,
+//                "New Menu", System.currentTimeMillis());
+//        // Hide the notification after its selected
+//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+//
+//        //adding LED lights to notification
+//        notification.defaults |= Notification.DEFAULT_LIGHTS;
+//
+//        Intent intent = new Intent(this,
+//                Test.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+//                intent, 0);
+//        notification.setLatestEventInfo(context, "Foogle",
+//                "New menu received", pendingIntent);
+//        notificationManager.notify(0, notification);
+        Intent resultIntent = new Intent(this, Test.class);
+// Because clicking the notification opens a new ("special") activity, there's
+// no need to create an artificial back stack.
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
 
-        //adding LED lights to notification
-        notification.defaults |= Notification.DEFAULT_LIGHTS;
-
-        Intent intent = new Intent("android.intent.action.VIEW",
-                Uri.parse("http://my.example.com/"));
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-                intent, 0);
-        notification.setLatestEventInfo(context, "Message",
-                "New message received", pendingIntent);
-        notificationManager.notify(0, notification);
-
+        mBuilder.setContentIntent(resultPendingIntent);
+        int mNotificationId = 001;
+// Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+// Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
