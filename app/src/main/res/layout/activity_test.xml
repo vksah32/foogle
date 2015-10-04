@@ -10,8 +10,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Resturant 1"
-        android:id="@+id/textView"
-        android:layout_alignParentBottom="true"
+
+        android:id="@+id/restaurantName"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="154dp" />
+        android:fontFeatureSettings="@string/app_name"
+        android:textStyle="bold"
+        android:onClick="gotolink" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/resMenu"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true" />
 </RelativeLayout>

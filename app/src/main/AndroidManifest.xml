@@ -34,7 +34,6 @@
         </activity>
         <activity android:name=".Test" >
         </activity>
->>>>>>> welcome_screen
     </application>
 
 </manifest>

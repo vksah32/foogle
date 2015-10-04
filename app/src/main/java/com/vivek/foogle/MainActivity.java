@@ -3,6 +3,8 @@ package com.vivek.foogle;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.net.ParseException;
 import android.app.Notification;
@@ -19,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
@@ -44,11 +47,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static android.app.Notification.*;
+
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private NotificationCompat.Builder mBuilder;
+    private String mCurrentRestaurant = "None";
 
 
     LocationRequest mLocationRequest;
@@ -57,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ImageView logo = (ImageView) findViewById(R.id.logo);
+        logo.setImageResource(R.drawable.logo);
 
         ParseObject testObject = new ParseObject("TestObject");
         testObject.put("foo", "bar");
@@ -68,18 +76,19 @@ public class MainActivity extends AppCompatActivity implements
 //                mGoogleApiClient.connect();
 //            }
         //start service
+//        Bitmap largeIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
         mBuilder =
                 new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.mipmap.ic_launcher2)
                         .setContentTitle("Foogle")
                         .setContentText("New Menu received!")
+                        .setContentInfo(mCurrentRestaurant)
                         .setAutoCancel(true)
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setCategory(Notification.CATEGORY_RECOMMENDATION);
+                        .setPriority(PRIORITY_MAX)
+                        .setCategory(CATEGORY_RECOMMENDATION);
 
-        // minimize window
-        createNotification(this, "Lous");
+
 
     }
 
@@ -134,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements
 //                "New menu received", pendingIntent);
 //        notificationManager.notify(0, notification);
         Intent resultIntent = new Intent(this, Test.class);
+        resultIntent.putExtra("Restaurant",mCurrentRestaurant);
 // Because clicking the notification opens a new ("special") activity, there's
 // no need to create an artificial back stack.
         PendingIntent resultPendingIntent =
@@ -181,8 +191,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        Toast.makeText(this, "lalallal",Toast.LENGTH_SHORT).show();
-
     }
 
 
@@ -202,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements
 //            mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
 //            mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
             Log.d("DEBUXX","HGCWGHCSHG");
-            Toast.makeText(this, String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, String.valueOf(mLastLocation.getLatitude()), Toast.LENGTH_SHORT).show();
         }
         createLocationRequest();
         boolean mRequestingLocationUpdates = true;
@@ -240,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements
         mLastLocation = location;
 //        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 //        updateUI();
-        Toast.makeText(MainActivity.this, "changed location", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "changed location", Toast.LENGTH_SHORT).show();
         TextView textView = (TextView) findViewById(R.id.textView2);
         textView.setText(String.valueOf(mLastLocation.getLatitude()) + String.valueOf(mLastLocation.getLongitude()));
         TextView textView1 = (TextView) findViewById(R.id.textView3);
@@ -253,16 +261,20 @@ public class MainActivity extends AppCompatActivity implements
 //        loc2.setLatitude(43.706309);
 //        loc2.setLongitude(-72.288587);
         for(int i =0; i < mListOfRestaurants.size(); i++){
-            Log.d("LOOP",""+i);
+            mCurrentRestaurant = "NOne";
+            Log.d("LOOP", "" + i);
             Location dest = new Location("");
             dest.setLatitude((double) mListOfRestaurants.get(i).get("latitude"));
             dest.setLongitude((double) mListOfRestaurants.get(i).get("longitude"));
             double distance = mLastLocation.distanceTo(dest);
-            textView1.setText( ""+distance +" " +mListOfRestaurants.get(i).get("Name"));
-            Log.d("LOOP",""+mListOfRestaurants.get(i).get("Name"));
+            textView1.setText("" + distance + " " + mListOfRestaurants.get(i).get("Name"));
+            Log.d("LOOP", "" + mListOfRestaurants.get(i).get("Name"));
             if (distance < (double) mListOfRestaurants.get(i).get("rad")){
                 textView2.setText( ""+mListOfRestaurants.get(i).get("Name"));
+                mCurrentRestaurant = (String) mListOfRestaurants.get(i).get("Name");
+                createNotification(this, mCurrentRestaurant);
             }
+
 
         }
 
