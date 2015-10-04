@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.net.ParseException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +24,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.parse.FindCallback;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 
 import java.net.MalformedURLException;
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements
     LocationRequest mLocationRequest;
     protected ArrayList<Geofence> mGeofenceList;
     private boolean mGeofencesAdded;
-    private List<ParseObject>
+    private ArrayList<ParseObject> mListOfRestaurants = new ArrayList<ParseObject>();
 
     /**
      * Used when requesting to add or remove geofences.
@@ -81,6 +84,27 @@ public class MainActivity extends AppCompatActivity implements
 
         //start service
         // minimize window
+
+    }
+
+    private void getAllREstaurants() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Restaurant");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> restaurantList, com.parse.ParseException e) {
+                if (e == null) {
+                    Log.d("score", "Retrieved " + restaurantList.size() + " restaurants");
+
+                    mListOfRestaurants.addAll(restaurantList);
+
+                } else {
+                    Log.d("score", "Error: " + e.getMessage());
+                }
+
+            }
+
+
+        });
 
     }
 
@@ -185,19 +209,32 @@ public class MainActivity extends AppCompatActivity implements
         textView.setText(String.valueOf(mLastLocation.getLatitude()) + String.valueOf(mLastLocation.getLongitude()));
         TextView textView1 = (TextView) findViewById(R.id.textView3);
         TextView textView2 = (TextView) findViewById(R.id.textView4);
-        Location loc1 = new Location("");
-        loc1.setLatitude(43.706306 );
-        loc1.setLongitude(-72.288588);
+//        Location loc1 = new Location("");
+//        loc1.setLatitude(43.706306 );
+//        loc1.setLongitude(-72.288588);
+//
+//        Location loc2 = new Location("");
+//        loc2.setLatitude(43.706309);
+//        loc2.setLongitude(-72.288587);
+        for(int i =0; i < mListOfRestaurants.size(); i++){
+            Log.d("LOOP",""+i);
+            Location dest = new Location("");
+            dest.setLatitude((double) mListOfRestaurants.get(i).get("latitude"));
+            dest.setLongitude((double) mListOfRestaurants.get(i).get("longitude"));
+            double distance = mLastLocation.distanceTo(dest);
+            textView1.setText( ""+distance +" " +mListOfRestaurants.get(i).get("Name"));
+            Log.d("LOOP",""+mListOfRestaurants.get(i).get("Name"));
+            if (distance < (double) mListOfRestaurants.get(i).get("rad")){
+                textView2.setText( ""+mListOfRestaurants.get(i).get("Name"));
+            }
 
-        Location loc2 = new Location("");
-        loc2.setLatitude(43.706309);
-        loc2.setLongitude(-72.288587);
+        }
 
 
 
 
-        textView1.setText("" + loc1.distanceTo(mLastLocation));
-        textView2.setText( ""+loc2.distanceTo(mLastLocation));
+
+//        textView2.setText( ""+loc2.distanceTo(mLastLocation));
 
 
     }
@@ -361,6 +398,8 @@ public class MainActivity extends AppCompatActivity implements
                     .build());
         }
     }
+
+
 
 
 }
