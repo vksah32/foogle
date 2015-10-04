@@ -11,6 +11,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.net.Uri;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,12 +27,12 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
     private boolean mConnected;
     LocationRequest mLocationRequest;
 
-
     public MyService() {
         if (haveWifiConnection()) {
             buildGoogleApiClient();
             if (mGoogleApiClient != null) {
                 mGoogleApiClient.connect();
+
             }
         } else {
             Toast.makeText(getApplicationContext(), "Connection failed!!", Toast.LENGTH_SHORT).show();
@@ -40,6 +44,8 @@ public class MyService extends Service implements GoogleApiClient.ConnectionCall
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
     }
+
+
 
 
     protected synchronized void buildGoogleApiClient() {
