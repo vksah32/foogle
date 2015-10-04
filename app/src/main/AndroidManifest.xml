@@ -30,6 +30,14 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".TestPage"
+            android:label="@string/title_activity_test_page"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity android:name=".Test" >
+        </activity>
     </application>
 
 </manifest>
